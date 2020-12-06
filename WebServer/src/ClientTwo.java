@@ -43,5 +43,13 @@ public class ClientTwo {
             while ((line = reader.readLine()) != null) {
                 System.out.println(line);
             }
+        } catch (UnknownHostException ex) {
+ 
+            System.out.println("Server not found: " + ex.getMessage());
+ 
+        } catch (IOException ex) {
+ 
+            System.out.println("I/O error: " + ex.getMessage());
+        }
     }
 }
