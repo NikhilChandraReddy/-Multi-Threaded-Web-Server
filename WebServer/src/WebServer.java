@@ -56,7 +56,38 @@ final class HttpRequest implements Runnable
 
     private void processRequest() throws Exception
     {
-    	
+    	BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+        StringBuilder requestBuilder = new StringBuilder();
+        String line;
+        while (!(line = br.readLine()).isEmpty()) {
+            requestBuilder.append(line + "\r\n");
+        }
+
+        String request = requestBuilder.toString();
+        System.out.println("\n\n"+request);
+        String[] requestsLines = request.split("\r\n");
+        String[] requestLine = requestsLines[0].split(" ");
+        String method = requestLine[0];
+        String path = requestLine[1];
+        String version = requestLine[2];
+        String host = requestsLines[1].split(" ")[1];
+
+        Path filePath = getFilePath(path);
+        if (Files.exists(filePath)) {
+            // file exist
+            String contentType = guessContentType(filePath);
+            sendResponse(socket, "200 OK", contentType, Files.readAllBytes(filePath));
+            //Thread.sleep(100000);
+        } else {
+            // 404
+            byte[] notFoundContent = "<h1> 404 Not Found </h1>".getBytes(); //"".getBytes(); 
+            sendResponse(socket, "404 Not Found", "text/html", notFoundContent);
+            //Thread.sleep(100000);
+        }
+
+        Thread currentThread = Thread.currentThread();
+        System.out.println("Request is responded Thread ID:" + currentThread.getId()+"\n\n");
     }
        
 }
